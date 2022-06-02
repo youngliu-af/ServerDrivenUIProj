@@ -8,9 +8,26 @@
 import SwiftUI
 
 struct ContentView: View {
+   
+    @StateObject private var vm: PetListViewModel
+    
+    init() {
+        _vm = StateObject(wrappedValue: PetListViewModel(service: Webservice()))
+    }
+   
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        NavigationView {
+            List {
+                ForEach(vm.components, id: \.id) { component in
+                    component.render()
+                }
+                .navigationTitle("Pets")
+            }
+            .listStyle(.plain)
+            .task {
+                await vm.load()
+            }
+        }
     }
 }
 
